@@ -1,3 +1,4 @@
 {
-  "jwtPrivateKey": "otoolu_jwtPrivateKey"
+  "jwtPrivateKey": "otoolu_jwtPrivateKey",
+  "db": "otoolu_db"
 }
