@@ -41,34 +41,22 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
+  console.log("/register");
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let user = await User.findOne({ email: req.body.email });
-  if (user) return res.status(400).send("User already registered.");
-
-  user = new User(_.pick(req.body, ["name", "email", "password"]));
-  console.log(user);
-  const token = user.generateAuthToken();
-  user.token = token;
-  await user.save();
-
-  res
-    .header("x-auth-token", token)
-    .send(_.pick(user, ["_id", "name", "email"]));
-});
-
-router.post("/registerWithMobile", async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
-  let user = await User.findOne({ phone: req.body.phone });
+  let user = await User.findOne({ mobile: req.body.mobile });
   if (user) return res.status(400).send("User already registered.");
 
   user = new User(_.pick(req.body, ["name", "mobile", "password"]));
   console.log(user);
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
+  try {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+  } catch (ex) {
+    console.log("exk " + ex);
+  }
+
   const token = user.generateAuthToken();
   user.token = token;
   await user.save();
@@ -77,4 +65,5 @@ router.post("/registerWithMobile", async (req, res) => {
     .header("x-auth-token", token)
     .send(_.pick(user, ["_id", "name", "mobile"]));
 });
+
 module.exports = router;
